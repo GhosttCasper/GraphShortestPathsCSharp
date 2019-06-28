@@ -25,7 +25,8 @@ namespace GraphShortestPaths
         private static Graph ProcessGraph(Graph graph)
         {
             //graph.DagShortestPaths();
-            graph.BellmanFordAlgorithm();
+            //graph.BellmanFordAlgorithm();
+            graph.Dijkstra();
             string str= graph.PrintPredecessorSubgraph(graph.VerticesList[0]);
             Console.WriteLine(str);
             return graph;

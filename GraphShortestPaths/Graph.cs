@@ -186,6 +186,48 @@ namespace GraphShortestPaths
             }
         }
 
+        /// <summary>
+        /// Алгоритм Дейкстры. Сложность 0(V^2)
+        /// </summary>
+        public void Dijkstra()
+        {
+            Vertex source = VerticesList[0];
+            source.Distance = 0;
+            List<Vertex> discoveredVertices = new List<Vertex>();
+
+            List<Vertex> verticesToAddInTree = new List<Vertex>(VerticesList);
+
+            while (verticesToAddInTree.Count != 0)
+            {
+                Vertex curVertex = ExtractMin(verticesToAddInTree);
+                discoveredVertices.Add(curVertex);
+
+                foreach (var incidentEdge in curVertex.AdjacencyList)
+                {
+                    Relax(curVertex, incidentEdge.IncidentTo, incidentEdge.Weight);
+                }
+            }
+        }
+
+        private Vertex ExtractMin(List<Vertex> vertices)
+        {
+            Vertex minVertex = vertices[0];
+            int min = minVertex.Distance;
+
+            foreach (var vertex in vertices)
+            {
+                if (vertex.Distance < min)
+                {
+                    min = vertex.Distance;
+                    minVertex = vertex;
+                }
+            }
+
+            vertices.Remove(minVertex);
+            return minVertex;
+        }
+
+
         public string PrintPath(Vertex source, Vertex end, string str)
         {
             if (source == end)
@@ -282,24 +324,7 @@ namespace GraphShortestPaths
             return totalWeight;
         }
 
-        private Vertex ExtractMin(List<Vertex> vertices)
-        {
-            Vertex minVertex = vertices[0];
-            int min = minVertex.Key;
-
-            foreach (var vertex in vertices)
-            {
-                if (vertex.Key < min)
-                {
-                    min = vertex.Key;
-                    minVertex = vertex;
-                }
-            }
-
-            minVertex.Discovered = true;
-            vertices.Remove(minVertex);
-            return minVertex;
-        }
+        
 
         //public string OutputGraph()
         //{
