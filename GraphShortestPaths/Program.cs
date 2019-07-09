@@ -16,9 +16,10 @@ namespace GraphShortestPaths
         private static void Main(string[] args)
         {
             Graph graph = ReadFileWithAdjacencyList("input.txt");
+            graph.JohnsonAlgorithm();
 
-            if (!graph.IsEmpty())
-                graph = ProcessGraph(graph);
+            //if (!graph.IsEmpty())
+            //    graph = ProcessGraph(graph);
             WriteFile(graph, "output.txt");
         }
 
@@ -26,7 +27,7 @@ namespace GraphShortestPaths
         {
             //graph.DagShortestPaths();
             //graph.BellmanFordAlgorithm();
-            graph.Dijkstra();
+            //graph.Dijkstra();
             string str= graph.PrintPredecessorSubgraph(graph.VerticesList[0]);
             Console.WriteLine(str);
             return graph;

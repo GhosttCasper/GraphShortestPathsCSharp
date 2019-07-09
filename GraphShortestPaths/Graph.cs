@@ -66,18 +66,17 @@ namespace GraphShortestPaths
             {
                 incidentTo.Distance = incidentFrom.Distance + weight;
                 incidentTo.Parent = incidentFrom;
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>
         /// Алгоритм Беллмана-Форда. Сложность 0(V*Е)
         /// </summary>
-        public bool BellmanFordAlgorithm()
+        public bool BellmanFordAlgorithm(Vertex source)
         {
-            Vertex source = VerticesList[0];
             source.Distance = 0;
 
             bool stop = false;
@@ -88,7 +87,8 @@ namespace GraphShortestPaths
                 {
                     foreach (var incidentEdge in curVertex.AdjacencyList)
                     {
-                        stop = Relax(curVertex, incidentEdge.IncidentTo, incidentEdge.Weight);
+                        if (Relax(curVertex, incidentEdge.IncidentTo, incidentEdge.Weight))
+                            stop = false;
                     }
                 }
             }
@@ -186,15 +186,25 @@ namespace GraphShortestPaths
             }
         }
 
+        public void InitializeSingleSource(Vertex source)
+        {
+            foreach (var vertex in VerticesList)
+            {
+                vertex.Parent = null;
+                vertex.Distance = int.MaxValue;
+            }
+            source.Distance = 0;
+        }
         /// <summary>
         /// Алгоритм Дейкстры. Сложность 0(V^2)
+        /// Работает, если в графе веса ребер, исходящих из некоторого истока s, могут быть отрицательными,
+        /// веса всех других ребер неотрицательные, а циклы с отрицательными весами отсутствуют
         /// </summary>
-        public void Dijkstra()
+        public void Dijkstra(Vertex source)
         {
-            Vertex source = VerticesList[0];
-            source.Distance = 0;
-            List<Vertex> discoveredVertices = new List<Vertex>();
+            InitializeSingleSource(source);
 
+            List<Vertex> discoveredVertices = new List<Vertex>();
             List<Vertex> verticesToAddInTree = new List<Vertex>(VerticesList);
 
             while (verticesToAddInTree.Count != 0)
@@ -227,6 +237,102 @@ namespace GraphShortestPaths
             return minVertex;
         }
 
+        /// <summary>
+        /// Алгоритм Джонсона. Сложность 0(V^2*lgV + VE), если Фибоначчиевая  куча, или 0(VE*lgV).
+        /// Вычисление кратчайших путей между всеми парами вершин
+        /// </summary>
+        public void JohnsonAlgorithm()
+        {
+            Size += 1;
+            VerticesList.Add(new Vertex(Size));
+            Vertex curVertexFrom = VerticesList[Size - 1];
+            for (int i = 0; i < Size - 1; i++)
+            {
+                Vertex curVertexTo = VerticesList[i];
+                IncidentEdge curEdge = new IncidentEdge(curVertexTo, 0);
+                curVertexFrom.AdjacencyList.Add(curEdge);
+            }
+            if (BellmanFordAlgorithm(curVertexFrom) == false)
+                Console.WriteLine("Входной граф содержит цикл с отрицательным весом");
+            else
+            {
+                foreach (var vertex in VerticesList)
+                {
+                    foreach (var incidentEdge in vertex.AdjacencyList)
+                    {
+                        incidentEdge.Weight = incidentEdge.Weight + vertex.Distance - incidentEdge.IncidentTo.Distance;
+                    }
+                }
+                VerticesList.RemoveAt(Size - 1);
+                Size -= 1;
+
+                int[] Distances = new int[Size];
+                for (int i = 0; i < Size; i++)
+                {
+                    Distances[i] = VerticesList[i].Distance;
+                }
+                int[,] matrix = new int[Size, Size];
+
+                for (int i = 0; i < Size; i++)
+                {
+                    Dijkstra(VerticesList[i]);
+                    for (int j = 0; j < Size; j++)
+                    {
+                        matrix[i, j] = VerticesList[j].Distance + Distances[j] - Distances[i];
+                    }
+                }
+
+                StringBuilder output = new StringBuilder();
+                for (int i = 0; i < Size; i++)
+                {
+                    for (int j = 0; j < Size; j++)
+                    {
+                        output.Append(matrix[i, j] + " ");
+                    }
+                    output.Append("\n");
+                }
+                Console.WriteLine(output);
+            }
+        }
+
+        public void ExtendShortestPaths()
+        {
+            //n = L.rows
+            //2 Пусть V = (/ С) — новая матрица размером n x n
+            //3 for i = 1 to n
+            //4 for j = 1 to n
+            //5 1'г] = oo
+            //6 for к = 1 to n
+            //7 + wkj)
+            //8 return l!
+        }
+
+        //public void FasterAllPairsShortestPaths(W)
+        //{
+        //    1 п = W.rows
+        //    2 = W
+        //    3 m = 1
+        //    4 while m < n — 1
+        //    5 Пусть — новая матрица размером n x n
+        //    6 L(2m) = EXTEND - SHORTEST - PATHS(L(m), Z / m))
+        //    7 m = 2m
+        //    8 return L
+        //}
+
+        //public void FloydWarshall(W)
+        //{
+        //    1 п = W.rows
+        //    2 L > (°) = W
+        //    3 for к = 1
+        //    to n
+        //    4 Пусть D = (d\j ^ — новая матрица размером пхп
+        //    5 for i —
+        //    1 to n
+        //    6 for j = 1
+        //    to n
+        //    7 df = min(4 - 1 >,  ^ -1) + 45 - 1))
+        //    8 return D ^>
+        //}
 
         public string PrintPath(Vertex source, Vertex end, string str)
         {
@@ -246,86 +352,7 @@ namespace GraphShortestPaths
             str += end.Index + " ";
             return str;
         }
-
-        public void BuildInducedGraph(List<int> verticesIndexes)
-        {
-            foreach (var index in verticesIndexes)
-            {
-                foreach (var incidentEdge in VerticesList[index - 1].AdjacencyList)
-                {
-                    var adjacencyVertex = incidentEdge.IncidentTo.AdjacencyList;
-                    adjacencyVertex.Remove(adjacencyVertex.First(edge => edge.IncidentTo.Index == index));
-                }
-            }
-            foreach (var vertexToDeleteIndex in verticesIndexes)
-            {
-                VerticesList.RemoveAt(vertexToDeleteIndex - 1);
-            }
-        }
-
-        /// <summary>
-        /// Алгоритм Крускала. Сложность 0(Е lg V).
-        /// </summary>
-        public int MinimumSpanningTreeKruskal()
-        {
-            foreach (var curVertex in VerticesList)
-            {
-                foreach (var incidentEdge in curVertex.AdjacencyList)
-                {
-                    if (curVertex.Index < incidentEdge.IncidentTo.Index)
-                        EdgesList.Add(new Edge(curVertex, incidentEdge.IncidentTo, incidentEdge.Weight));
-                }
-            }
-
-            EdgesList.Sort((first, second) => first.Weight.CompareTo(second.Weight));
-
-            int totalWeight = 0;
-
-
-
-            return totalWeight;
-        }
-
-        public List<Edge> GetMinimumSpanningTreeKruskal()
-        {
-            List<Edge> minimumSpanningTree = new List<Edge>();
-            foreach (var edge in EdgesList)
-            {
-                if (edge.InTree)
-                    minimumSpanningTree.Add(edge);
-            }
-
-            return minimumSpanningTree;
-        }
-
-        public int MinimumSpanningTreePrim() // алгоритм Прима
-        {
-            Vertex source = VerticesList[0];
-            source.Key = 0;
-
-            List<Vertex> verticesToAddInTree = new List<Vertex>(VerticesList);
-
-            int totalWeight = 0;
-
-            while (verticesToAddInTree.Count != 0)
-            {
-                Vertex curVertex = ExtractMin(verticesToAddInTree);
-                totalWeight += curVertex.Key;
-                foreach (var incidentEdge in curVertex.AdjacencyList)
-                {
-                    if (!incidentEdge.IncidentTo.Discovered && incidentEdge.Weight < incidentEdge.IncidentTo.Key) //verticesToAddInTree.Contains(incidentEdge.IncidentTo)
-                    {
-                        incidentEdge.IncidentTo.Parent = curVertex;
-                        incidentEdge.IncidentTo.Key = incidentEdge.Weight;
-                    }
-                }
-            }
-
-            return totalWeight;
-        }
-
         
-
         //public string OutputGraph()
         //{
         //    string adjacencyMatrixStr = "";

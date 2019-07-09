@@ -16,9 +16,6 @@ namespace GraphShortestPaths
         public int DiscoveryTime;
         public int FinishingTime;
 
-        //public int Color;
-        public int Key; // минимальный вес среди всех ребер, соединяющих v с вершиной в дереве.
-
         public List<IncidentEdge> AdjacencyList;
 
         public Vertex(int index)
@@ -26,8 +23,6 @@ namespace GraphShortestPaths
             Index = index;
             Parent = null;
             Distance = int.MaxValue;
-            //Color = index - 1;
-            Key = int.MaxValue;
             AdjacencyList = new List<IncidentEdge>();
         }
     }
