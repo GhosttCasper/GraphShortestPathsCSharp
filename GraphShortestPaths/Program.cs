@@ -73,11 +73,7 @@ namespace GraphShortestPaths
             Graph graph;
             using (StreamReader reader = new StreamReader(fileName))
             {
-                var sizeStr = reader.ReadLine();
-                if (string.IsNullOrEmpty(sizeStr))
-                    throw new Exception("String is empty (ReadFile)");
-                var array = sizeStr.Split();
-                int size = int.Parse(array[0]);
+                int size = ReadNumber(reader);
 
                 string[] numbersStrs = new string[size];
                 for (int i = 0; i < size; i++)

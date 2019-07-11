@@ -195,6 +195,7 @@ namespace GraphShortestPaths
             }
             source.Distance = 0;
         }
+
         /// <summary>
         /// Алгоритм Дейкстры. Сложность 0(V^2)
         /// Работает, если в графе веса ребер, исходящих из некоторого истока s, могут быть отрицательными,
@@ -294,46 +295,7 @@ namespace GraphShortestPaths
                 Console.WriteLine(output);
             }
         }
-
-        public void ExtendShortestPaths()
-        {
-            //n = L.rows
-            //2 Пусть V = (/ С) — новая матрица размером n x n
-            //3 for i = 1 to n
-            //4 for j = 1 to n
-            //5 1'г] = oo
-            //6 for к = 1 to n
-            //7 + wkj)
-            //8 return l!
-        }
-
-        //public void FasterAllPairsShortestPaths(W)
-        //{
-        //    1 п = W.rows
-        //    2 = W
-        //    3 m = 1
-        //    4 while m < n — 1
-        //    5 Пусть — новая матрица размером n x n
-        //    6 L(2m) = EXTEND - SHORTEST - PATHS(L(m), Z / m))
-        //    7 m = 2m
-        //    8 return L
-        //}
-
-        //public void FloydWarshall(W)
-        //{
-        //    1 п = W.rows
-        //    2 L > (°) = W
-        //    3 for к = 1
-        //    to n
-        //    4 Пусть D = (d\j ^ — новая матрица размером пхп
-        //    5 for i —
-        //    1 to n
-        //    6 for j = 1
-        //    to n
-        //    7 df = min(4 - 1 >,  ^ -1) + 45 - 1))
-        //    8 return D ^>
-        //}
-
+        
         public string PrintPath(Vertex source, Vertex end, string str)
         {
             if (source == end)
