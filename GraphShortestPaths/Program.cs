@@ -20,7 +20,7 @@ namespace GraphShortestPaths
 
             //if (!graph.IsEmpty())
             //    graph = ProcessGraph(graph);
-            if (string.IsNullOrEmpty(result))
+            if (!string.IsNullOrEmpty(result))
                 WriteFile(result, "output.txt");
 
             string outputGraphFile = "..\\..\\output.txt";
