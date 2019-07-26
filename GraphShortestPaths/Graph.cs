@@ -352,4 +352,3 @@ namespace GraphShortestPaths
         }
     }
 }
-
