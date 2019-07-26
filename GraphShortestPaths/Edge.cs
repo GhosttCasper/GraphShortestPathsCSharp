@@ -6,29 +6,12 @@ using System.Threading.Tasks;
 
 namespace GraphShortestPaths
 {
-    public class Edge
+    public class IncidentEdge
     {
-        public int Weight;
-        public Vertex First; // IncidentFrom выходит (начало)
-        public Vertex Second; // IncidentTo входит (конец)
-        public bool InTree;
+        public int Weight { get; set; }
+        public Vertex IncidentTo { get; } // входит (конец)
 
-        public Edge(Vertex incidentFrom, Vertex incidentTo, int weight)
-        {
-            First = incidentFrom;
-            Second = incidentTo;
-            Weight = weight;
-            InTree = false;
-        }
-        
-    }
-    
-    public class IncidentEdge 
-    {
-        public int Weight;
-        public Vertex IncidentTo; // входит (конец)
-
-        public IncidentEdge(Vertex incidentTo, int weight) 
+        public IncidentEdge(Vertex incidentTo, int weight)
         {
             IncidentTo = incidentTo;
             Weight = weight;

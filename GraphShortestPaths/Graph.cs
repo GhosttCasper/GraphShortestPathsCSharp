@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +13,14 @@ namespace GraphShortestPaths
 {
     public class Graph
     {
-        public List<Vertex> VerticesList = new List<Vertex>();
-        public List<Edge> EdgesList = new List<Edge>();
-        private int Size;
-        public int Time;
+        public List<Vertex> VerticesList { get; }
+        public int Size { get; set; }
+        private int Time;
 
         public Graph(int size, string[] strs)
         {
             Size = size;
+            VerticesList = new List<Vertex>();
             for (int i = 1; i <= Size; i++)
                 VerticesList.Add(new Vertex(i));
 
@@ -171,7 +172,7 @@ namespace GraphShortestPaths
         /// <summary>
         /// В ориентированных ациклических графах. Сложность 0(V+Е)
         /// </summary>
-        public void DagShortestPaths()// only for directed acyclic graph
+        public void DagShortestPaths() // only for directed acyclic graph
         {
             List<Vertex> vertices = TopologicalSort();
             Vertex source = VerticesList[1];
@@ -205,13 +206,13 @@ namespace GraphShortestPaths
         {
             InitializeSingleSource(source);
 
-            List<Vertex> discoveredVertices = new List<Vertex>();
+            //List<Vertex> discoveredVertices = new List<Vertex>();
             List<Vertex> verticesToAddInTree = new List<Vertex>(VerticesList);
 
             while (verticesToAddInTree.Count != 0)
             {
                 Vertex curVertex = ExtractMin(verticesToAddInTree);
-                discoveredVertices.Add(curVertex);
+                //discoveredVertices.Add(curVertex);
 
                 foreach (var incidentEdge in curVertex.AdjacencyList)
                 {
@@ -242,7 +243,7 @@ namespace GraphShortestPaths
         /// Алгоритм Джонсона. Сложность 0(V^2*lgV + VE), если Фибоначчиевая  куча, или 0(VE*lgV).
         /// Вычисление кратчайших путей между всеми парами вершин
         /// </summary>
-        public void JohnsonAlgorithm()
+        public string JohnsonAlgorithm()
         {
             Size += 1;
             VerticesList.Add(new Vertex(Size));
@@ -272,8 +273,8 @@ namespace GraphShortestPaths
                 {
                     Distances[i] = VerticesList[i].Distance;
                 }
-                int[,] matrix = new int[Size, Size];
 
+                int[,] matrix = new int[Size, Size];
                 for (int i = 0; i < Size; i++)
                 {
                     Dijkstra(VerticesList[i]);
@@ -293,9 +294,12 @@ namespace GraphShortestPaths
                     output.Append("\n");
                 }
                 Console.WriteLine(output);
+                return output.ToString();
             }
+
+            return null;
         }
-        
+
         public string PrintPath(Vertex source, Vertex end, string str)
         {
             if (source == end)
@@ -314,25 +318,37 @@ namespace GraphShortestPaths
             str += end.Index + " ";
             return str;
         }
-        
-        //public string OutputGraph()
-        //{
-        //    string adjacencyMatrixStr = "";
-        //    foreach (var row in AdjacencyMatrix)
-        //    {
-        //        foreach (var edge in row)
-        //        {
-        //            adjacencyMatrixStr += edge.Weight.ToString();
-        //            adjacencyMatrixStr += " ";
-        //        }
-        //        adjacencyMatrixStr += "\n";
-        //    }
-        //    return adjacencyMatrixStr;
-        //}
 
         public bool IsEmpty()
         {
             return VerticesList.Count == 0;
+        }
+
+        public void SaveTxtFormatGraph(string graphFile)
+        {
+            using (StreamWriter writer = new StreamWriter(graphFile))
+            {
+                writer.WriteLine(Size);
+                writer.WriteLine(ToTxtFile());
+            }
+        }
+
+        public string ToTxtFile()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var vertex in VerticesList)
+            {
+                foreach (var edge in vertex.AdjacencyList)
+                {
+                    sb.Append(vertex.Index + " ");
+                    sb.Append(edge.IncidentTo.Index + " ");
+                    sb.Append(edge.Weight);
+                    sb.Append(Environment.NewLine);
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }
